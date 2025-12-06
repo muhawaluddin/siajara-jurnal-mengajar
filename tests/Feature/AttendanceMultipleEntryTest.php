@@ -30,6 +30,7 @@ class AttendanceMultipleEntryTest extends TestCase
 
         $journalMorning = TeachingJournal::create([
             'guru_id' => $user->id,
+            'classroom_id' => $classroom->id,
             'subject_id' => null,
             'mata_pelajaran' => 'Matematika',
             'tanggal' => $date->toDateString(),
@@ -41,6 +42,7 @@ class AttendanceMultipleEntryTest extends TestCase
 
         $journalAfternoon = TeachingJournal::create([
             'guru_id' => $user->id,
+            'classroom_id' => $classroom->id,
             'subject_id' => null,
             'mata_pelajaran' => 'Fisika',
             'tanggal' => $date->toDateString(),

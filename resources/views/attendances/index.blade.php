@@ -11,6 +11,8 @@
         'alpa' => 'bg-red-50 text-red-700 border border-red-200',
         'sakit' => 'bg-purple-50 text-purple-700 border border-purple-200',
         'izin' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+        'pulang izin' => 'bg-amber-50 text-amber-700 border border-amber-200',
+        'pulang sakit' => 'bg-blue-50 text-blue-700 border border-blue-200',
     ];
 @endphp
 
@@ -109,7 +111,7 @@
                             <select name="statuses[{{ $student->id }}]"
                                     class="w-full rounded-lg px-3 py-2 text-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 transition {{ $selectClasses }}">
                                 @foreach($statusOptions as $status)
-                                    <option value="{{ $status }}" @selected($currentStatus === $status)>{{ ucfirst($status) }}</option>
+                                    <option value="{{ $status }}" @selected($currentStatus === $status)>{{ ucwords($status) }}</option>
                                 @endforeach
                             </select>
                         </td>
@@ -129,6 +131,8 @@
         <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-green-700 border border-green-200">Hadir</span>
         <span class="inline-flex items-center rounded-full bg-yellow-50 px-3 py-1 text-yellow-700 border border-yellow-200">Izin</span>
         <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-purple-700 border border-purple-200">Sakit</span>
+        <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-amber-700 border border-amber-200">Pulang Izin</span>
+        <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-blue-700 border border-blue-200">Pulang Sakit</span>
         <span class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-red-700 border border-red-200">Alpa</span>
     </div>
 @endif

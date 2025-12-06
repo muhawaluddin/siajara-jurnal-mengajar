@@ -17,12 +17,14 @@ class StoreTeachingJournalRequest extends FormRequest
     {
         return [
             'guru_id' => ['required', 'exists:users,id'],
+            'classroom_id' => ['required', 'exists:classrooms,id'],
             'mata_pelajaran' => ['required', 'string', 'max:150'],
             'tanggal' => ['required', 'date'],
             'jam_mulai' => ['required', 'date_format:H:i'],
             'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
             'topik' => ['required', 'string', 'max:255'],
             'catatan' => ['nullable', 'string'],
+            'documentation' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ];
     }
 }

@@ -139,7 +139,9 @@
         }
         .badge-hadir { background: #dcfce7; color: #166534; }
         .badge-izin { background: #e0f2fe; color: #1d4ed8; }
+        .badge-pulang-izin { background: #fef3c7; color: #b45309; }
         .badge-sakit { background: #fee2e2; color: #b91c1c; }
+        .badge-pulang-sakit { background: #e0f2fe; color: #0ea5e9; }
         .badge-alpa { background: #fef3c7; color: #b45309; }
         .section-note {
             margin-top: 8px;
@@ -196,7 +198,9 @@
             <div>
                 <span class="badge badge-hadir">Hadir {{ $attendance['summary']['hadir'] ?? 0 }}</span>
                 <span class="badge badge-izin">Izin {{ $attendance['summary']['izin'] ?? 0 }}</span>
+                <span class="badge badge-pulang-izin">Pulang Izin {{ $attendance['summary']['pulang izin'] ?? 0 }}</span>
                 <span class="badge badge-sakit">Sakit {{ $attendance['summary']['sakit'] ?? 0 }}</span>
+                <span class="badge badge-pulang-sakit">Pulang Sakit {{ $attendance['summary']['pulang sakit'] ?? 0 }}</span>
                 <span class="badge badge-alpa">Alpa {{ $attendance['summary']['alpa'] ?? 0 }}</span>
             </div>
         </div>
@@ -205,12 +209,14 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:28%">Nama Siswa</th>
-                        <th style="width:18%">Kelas</th>
-                        <th style="width:12%">Hadir</th>
-                        <th style="width:12%">Izin</th>
-                        <th style="width:12%">Sakit</th>
-                        <th style="width:12%">Alpa</th>
+                        <th style="width:24%">Nama Siswa</th>
+                        <th style="width:16%">Kelas</th>
+                        <th style="width:10%">Hadir</th>
+                        <th style="width:10%">Izin</th>
+                        <th style="width:10%">Pulang Izin</th>
+                        <th style="width:10%">Sakit</th>
+                        <th style="width:10%">Pulang Sakit</th>
+                        <th style="width:10%">Alpa</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -220,12 +226,14 @@
                         <td>{{ $item['student']['classroom'] ?? '-' }}</td>
                         <td>{{ $item['totals']['hadir'] ?? 0 }}</td>
                         <td>{{ $item['totals']['izin'] ?? 0 }}</td>
+                        <td>{{ $item['totals']['pulang izin'] ?? 0 }}</td>
                         <td>{{ $item['totals']['sakit'] ?? 0 }}</td>
+                        <td>{{ $item['totals']['pulang sakit'] ?? 0 }}</td>
                         <td>{{ $item['totals']['alpa'] ?? 0 }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="empty-state">Belum ada data absensi pada periode ini.</td>
+                        <td colspan="8" class="empty-state">Belum ada data absensi pada periode ini.</td>
                     </tr>
                 @endforelse
                 </tbody>

@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Catat sesi mengajar terbaru Anda.')
 
 @section('content')
-<form method="POST" action="{{ route('web.teaching-journals.store') }}" class="space-y-6">
+<form method="POST" action="{{ route('web.teaching-journals.store') }}" class="space-y-6" enctype="multipart/form-data">
     @csrf
     @include('teaching-journals.partials.form')
 </form>

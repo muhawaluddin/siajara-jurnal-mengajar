@@ -25,7 +25,7 @@ class StoreAttendanceRequest extends FormRequest
                     $query->where('student_id', $this->input('student_id'))
                 ),
             ],
-            'status' => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alpa'])],
+            'status' => ['required', Rule::in(['hadir', 'izin', 'pulang izin', 'sakit', 'pulang sakit', 'alpa'])],
         ];
     }
 }

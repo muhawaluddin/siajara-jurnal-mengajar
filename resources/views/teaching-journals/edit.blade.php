@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Perbarui catatan mengajar jika terdapat perubahan.')
 
 @section('content')
-<form method="POST" action="{{ route('web.teaching-journals.update', $teachingJournal) }}" class="space-y-6">
+<form method="POST" action="{{ route('web.teaching-journals.update', $teachingJournal) }}" class="space-y-6" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     @include('teaching-journals.partials.form', ['teachingJournal' => $teachingJournal])

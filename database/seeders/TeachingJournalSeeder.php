@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
+use App\Models\Classroom;
 use App\Models\Subject;
 use App\Models\TeachingJournal;
 use App\Models\User;
@@ -26,6 +27,12 @@ class TeachingJournalSeeder extends Seeder
             ]);
         }
 
+        $classroom = Classroom::query()->orderBy('name')->first();
+
+        if ($classroom === null) {
+            $classroom = Classroom::query()->create(['name' => 'X IPA 1']);
+        }
+
         $baseDate = Carbon::now()->startOfMonth();
         $subject = Subject::firstOrCreate(['name' => 'Matematika']);
 
@@ -37,6 +44,7 @@ class TeachingJournalSeeder extends Seeder
                     'mata_pelajaran' => $subject->name,
                 ],
                 [
+                    'classroom_id' => $classroom->id,
                     'subject_id' => $subject->id,
                     'jam_mulai' => '08:00',
                     'jam_selesai' => '09:40',

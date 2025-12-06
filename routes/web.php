@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\ClassroomController;
+use App\Http\Controllers\Admin\GradeReportController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Auth\WebLoginController;
 use App\Http\Controllers\Web\AttendanceController as WebAttendanceController;
 use App\Http\Controllers\Web\StudentController as WebStudentController;
+use App\Http\Controllers\Web\StudentAttendanceReportController;
 use App\Http\Controllers\Web\TeachingJournalController as WebTeachingJournalController;
+use App\Http\Controllers\Web\GradeController as WebGradeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,13 +33,15 @@ Route::middleware('auth')->group(function () {
         Route::resource('classrooms', ClassroomController::class)->except('show');
         Route::resource('subjects', SubjectController::class)->except('show');
         Route::post('students/import', [WebStudentController::class, 'import'])->name('students.import');
-        Route::resource('students', WebStudentController::class)->except('show')->names('students');
+        Route::resource('students', WebStudentController::class)->names('students');
         Route::resource('teachers', TeacherController::class)
             ->except('show')
             ->parameters(['teachers' => 'teacher'])
             ->names('teachers');
 
         Route::get('teacher-reports', [\App\Http\Controllers\Web\TeacherReportController::class, 'index'])->name('teacher-reports.index');
+        Route::get('student-attendance-reports', [StudentAttendanceReportController::class, 'index'])->name('student-attendance.index');
+        Route::get('grades', [GradeReportController::class, 'index'])->name('grades.index');
 
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('reports/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
@@ -53,5 +58,11 @@ Route::middleware('auth')->group(function () {
             ->except('show')
             ->parameters(['teaching-journals' => 'teachingJournal'])
             ->names('web.teaching-journals');
+    });
+
+    Route::middleware('role:guru')->group(function () {
+        Route::resource('grades', WebGradeController::class)
+            ->parameters(['grades' => 'assessment'])
+            ->names('web.grades');
     });
 });

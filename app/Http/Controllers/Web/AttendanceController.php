@@ -17,7 +17,7 @@ use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
-    private array $statusOptions = ['hadir', 'izin', 'sakit', 'alpa'];
+    private array $statusOptions = ['hadir', 'izin', 'pulang izin', 'sakit', 'pulang sakit', 'alpa'];
 
     public function index(Request $request): View
     {

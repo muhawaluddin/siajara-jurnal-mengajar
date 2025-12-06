@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\TeachingJournal;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class MonthlyReportService
 {
@@ -44,7 +45,7 @@ class MonthlyReportService
             ->get();
 
         $journalCollection = TeachingJournal::query()
-            ->with(['guru', 'subject'])
+            ->with(['guru', 'subject', 'classroom'])
             ->whereBetween('tanggal', [$period['start']->toDateString(), $period['end']->toDateString()])
             ->orderBy('tanggal')
             ->get();
@@ -73,7 +74,9 @@ class MonthlyReportService
                 $totals = [
                     'hadir' => $entries->where('status', 'hadir')->count(),
                     'izin' => $entries->where('status', 'izin')->count(),
+                    'pulang izin' => $entries->where('status', 'pulang izin')->count(),
                     'sakit' => $entries->where('status', 'sakit')->count(),
+                    'pulang sakit' => $entries->where('status', 'pulang sakit')->count(),
                     'alpa' => $entries->where('status', 'alpa')->count(),
                 ];
 
@@ -96,7 +99,9 @@ class MonthlyReportService
         $aggregate = [
             'hadir' => $attendances->where('status', 'hadir')->count(),
             'izin' => $attendances->where('status', 'izin')->count(),
+            'pulang izin' => $attendances->where('status', 'pulang izin')->count(),
             'sakit' => $attendances->where('status', 'sakit')->count(),
+            'pulang sakit' => $attendances->where('status', 'pulang sakit')->count(),
             'alpa' => $attendances->where('status', 'alpa')->count(),
             'total_records' => $attendances->count(),
             'total_students' => $attendances->pluck('student_id')->unique()->count(),
@@ -116,6 +121,10 @@ class MonthlyReportService
         $items = $journals->map(function ($journal) {
             $durationMinutes = Carbon::parse($journal->jam_mulai)->diffInMinutes(Carbon::parse($journal->jam_selesai));
             $subjectName = $journal->subject?->name ?? $journal->mata_pelajaran;
+            $classroomName = $journal->classroom?->name;
+            $documentationUrl = $journal->documentation_path
+                ? Storage::disk('public')->url($journal->documentation_path)
+                : null;
 
             return [
                 'id' => $journal->id,
@@ -135,6 +144,11 @@ class MonthlyReportService
                     'id' => $journal->subject?->id,
                     'name' => $subjectName,
                 ],
+                'classroom' => [
+                    'id' => $journal->classroom?->id,
+                    'name' => $classroomName,
+                ],
+                'documentation_url' => $documentationUrl,
             ];
         })->values();
 

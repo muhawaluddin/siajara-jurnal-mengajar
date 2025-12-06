@@ -11,6 +11,8 @@
         'alpa' => 'bg-red-50 text-red-700 border border-red-200',
         'sakit' => 'bg-purple-50 text-purple-700 border border-purple-200',
         'izin' => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+        'pulang izin' => 'bg-amber-50 text-amber-700 border border-amber-200',
+        'pulang sakit' => 'bg-blue-50 text-blue-700 border border-blue-200',
     ];
 @endphp
 
@@ -56,7 +58,7 @@
                     class="mt-1 w-40 rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200">
                 <option value="">Semua</option>
                 @foreach($statusOptions as $status)
-                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucwords($status) }}</option>
                 @endforeach
             </select>
         </div>
@@ -97,7 +99,7 @@
                 </td>
                 <td class="px-4 py-3">
                     <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $statusStyles[$attendance->status] ?? 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                        {{ ucfirst($attendance->status) }}
+                        {{ ucwords($attendance->status) }}
                     </span>
                 </td>
                 <td class="px-4 py-3 text-right">

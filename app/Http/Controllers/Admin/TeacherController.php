@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,7 +34,9 @@ class TeacherController extends Controller
 
     public function create(): View
     {
-        return view('admin.teachers.create');
+        $subjects = Subject::orderBy('name')->get();
+
+        return view('admin.teachers.create', compact('subjects'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -42,14 +45,18 @@ class TeacherController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
+            'subject_ids' => ['array'],
+            'subject_ids.*' => ['exists:subjects,id'],
         ]);
 
-        User::create([
+        $teacher = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => UserRole::Guru,
         ]);
+
+        $teacher->subjects()->sync($validated['subject_ids'] ?? []);
 
         return redirect()->route('admin.teachers.index')->with('status', 'Guru baru berhasil ditambahkan.');
     }
@@ -58,7 +65,9 @@ class TeacherController extends Controller
     {
         abort_unless($teacher->role === UserRole::Guru, 404);
 
-        return view('admin.teachers.edit', compact('teacher'));
+        $subjects = Subject::orderBy('name')->get();
+
+        return view('admin.teachers.edit', compact('teacher', 'subjects'));
     }
 
     public function update(Request $request, User $teacher): RedirectResponse
@@ -69,6 +78,8 @@ class TeacherController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$teacher->id],
             'password' => ['nullable', 'string', 'min:8'],
+            'subject_ids' => ['array'],
+            'subject_ids.*' => ['exists:subjects,id'],
         ]);
 
         $teacher->update([
@@ -76,6 +87,8 @@ class TeacherController extends Controller
             'email' => $validated['email'],
             'password' => $validated['password'] ? Hash::make($validated['password']) : $teacher->password,
         ]);
+
+        $teacher->subjects()->sync($validated['subject_ids'] ?? []);
 
         return redirect()->route('admin.teachers.index')->with('status', 'Data guru berhasil diperbarui.');
     }

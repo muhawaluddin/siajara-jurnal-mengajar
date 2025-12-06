@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk | {{ config('app.name') }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900">
 <div class="w-full max-w-md bg-white/95 shadow-2xl rounded-2xl p-8 backdrop-blur">

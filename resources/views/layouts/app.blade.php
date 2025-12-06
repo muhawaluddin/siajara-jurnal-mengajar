@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', config('app.name'))</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>[x-cloak]{display:none !important;}</style>
 </head>
@@ -41,6 +41,10 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
+            <div x-data="liveClock()" x-init="start()" class="hidden items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-semibold text-white shadow-sm sm:inline-flex">
+                <svg class="mr-1.5 h-4 w-4 text-emerald-100/80" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                <span x-text="now"></span>
+            </div>
             <button type="button"
                     class="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 p-2 text-white shadow-sm transition hover:bg-white/20 lg:hidden"
                     @click="mobileMenuOpen = ! mobileMenuOpen">
@@ -82,20 +86,23 @@
                     <li><a href="{{ route('admin.subjects.index') }}" class="block px-4 py-2 hover:bg-emerald-50">Master Mapel</a></li>
                     <li><a href="{{ route('admin.students.index') }}" class="block px-4 py-2 hover:bg-emerald-50">Data Siswa</a></li>
                     <li><a href="{{ route('admin.teachers.index') }}" class="block px-4 py-2 hover:bg-emerald-50">Data Guru</a></li>
-                    <li x-data="{ open: @json(request()->routeIs('admin.reports.*') || request()->routeIs('admin.teacher-reports.*')) }" class="border-t border-emerald-100/60 pt-2 mt-2">
+                    <li x-data="{ open: @json(request()->routeIs('admin.reports.*') || request()->routeIs('admin.teacher-reports.*') || request()->routeIs('admin.student-attendance.*') || request()->routeIs('admin.grades.*')) }" class="border-t border-emerald-100/60 pt-2 mt-2">
                         <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-lg px-4 py-2 text-left font-semibold text-emerald-700 hover:bg-emerald-50">
                             <span>Laporan</span>
                             <svg class="h-4 w-4 text-emerald-600 transition-transform" :class="open ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.25a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clip-rule="evenodd"/></svg>
                         </button>
                         <div x-show="open" x-transition x-cloak class="mt-1 space-y-1 pl-4 text-sm">
                             <a href="{{ route('admin.reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('admin.reports.*') ? 'bg-emerald-100 text-emerald-800 font-semibold' : 'hover:bg-emerald-50 text-emerald-700' }}">Laporan Absensi Siswa</a>
+                            <a href="{{ route('admin.student-attendance.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('admin.student-attendance.*') ? 'bg-emerald-100 text-emerald-800 font-semibold' : 'hover:bg-emerald-50 text-emerald-700' }}">Rekap Kehadiran Siswa</a>
                             <a href="{{ route('admin.teacher-reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('admin.teacher-reports.*') ? 'bg-emerald-100 text-emerald-800 font-semibold' : 'hover:bg-emerald-50 text-emerald-700' }}">Laporan Jurnal Mengajar</a>
+                            <a href="{{ route('admin.grades.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('admin.grades.*') ? 'bg-emerald-100 text-emerald-800 font-semibold' : 'hover:bg-emerald-50 text-emerald-700' }}">Laporan Nilai Siswa</a>
                         </div>
                     </li>
                 @endif
                 @if($user?->isGuru())
                     <li><a href="{{ route('web.teaching-journals.index') }}" class="block px-4 py-2 hover:bg-emerald-50">Jurnal Mengajar</a></li>
                     <li><a href="{{ route('web.attendances.index') }}" class="block px-4 py-2 hover:bg-emerald-50">Absensi</a></li>
+                    <li><a href="{{ route('web.grades.index') }}" class="block px-4 py-2 hover:bg-emerald-50">Nilai Mata Pelajaran</a></li>
                 @endif
             </ul>
         </div>
@@ -170,10 +177,10 @@
                             <span class="sr-only" x-show="!sidebarExpanded" x-transition.origin.left>Data Guru</span>
                         </a>
                     </li>
-                    <li x-data="{ open: @json(request()->routeIs('admin.reports.*') || request()->routeIs('admin.teacher-reports.*')) }" class="w-full">
+                    <li x-data="{ open: @json(request()->routeIs('admin.reports.*') || request()->routeIs('admin.teacher-reports.*') || request()->routeIs('admin.student-attendance.*') || request()->routeIs('admin.grades.*')) }" class="w-full">
                         <button type="button"
                                 @click="open = !open"
-                                class="flex w-full items-center gap-3 rounded-lg py-2 transition-all duration-300 {{ request()->routeIs('admin.reports.*') || request()->routeIs('admin.teacher-reports.*') ? 'bg-emerald-700/80 text-emerald-100' : 'hover:bg-emerald-800/70 text-emerald-200' }}"
+                                class="flex w-full items-center gap-3 rounded-lg py-2 transition-all duration-300 {{ request()->routeIs('admin.reports.*') || request()->routeIs('admin.teacher-reports.*') || request()->routeIs('admin.student-attendance.*') || request()->routeIs('admin.grades.*') ? 'bg-emerald-700/80 text-emerald-100' : 'hover:bg-emerald-800/70 text-emerald-200' }}"
                                 :class="sidebarExpanded ? 'px-4 justify-start' : 'px-0 justify-center'">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75h9M12 3.75v4.5m5.25 0h.75a2.25 2.25 0 0 1 2.25 2.25v7.5A2.25 2.25 0 0 1 18 20.25H6a2.25 2.25 0 0 1-2.25-2.25v-7.5A2.25 2.25 0 0 1 6 8.25h.75"/></svg>
                             <span x-show="sidebarExpanded" x-transition.origin.left class="flex-1 text-left">Laporan</span>
@@ -185,9 +192,17 @@
                                class="block rounded-lg px-3 py-2 font-medium transition {{ request()->routeIs('admin.reports.*') ? 'bg-emerald-700 text-white' : 'hover:bg-emerald-800/70 text-emerald-200' }}">
                                 Laporan Absensi Siswa
                             </a>
+                            <a href="{{ route('admin.student-attendance.index') }}"
+                               class="block rounded-lg px-3 py-2 font-medium transition {{ request()->routeIs('admin.student-attendance.*') ? 'bg-emerald-700 text-white' : 'hover:bg-emerald-800/70 text-emerald-200' }}">
+                                Rekap Kehadiran Siswa
+                            </a>
                             <a href="{{ route('admin.teacher-reports.index') }}"
                                class="block rounded-lg px-3 py-2 font-medium transition {{ request()->routeIs('admin.teacher-reports.*') ? 'bg-emerald-700 text-white' : 'hover:bg-emerald-800/70 text-emerald-200' }}">
                                 Laporan Jurnal Mengajar
+                            </a>
+                            <a href="{{ route('admin.grades.index') }}"
+                               class="block rounded-lg px-3 py-2 font-medium transition {{ request()->routeIs('admin.grades.*') ? 'bg-emerald-700 text-white' : 'hover:bg-emerald-800/70 text-emerald-200' }}">
+                                Laporan Nilai Siswa
                             </a>
                         </div>
                     </li>
@@ -210,6 +225,15 @@
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12 6 6 9-13.5"/></svg>
                             <span x-show="sidebarExpanded" x-transition.origin.left class="whitespace-nowrap">Absensi</span>
                             <span class="sr-only" x-show="!sidebarExpanded" x-transition.origin.left>Absensi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('web.grades.index') }}"
+                           class="flex items-center gap-3 rounded-lg py-2 transition-all duration-300 {{ request()->routeIs('web.grades.*') ? 'bg-emerald-700/80 text-emerald-100' : 'hover:bg-emerald-800/70 text-emerald-200' }}"
+                           :class="sidebarExpanded ? 'px-4 justify-start' : 'px-0 justify-center'">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5h16.5m-16.5 6h16.5m-16.5 6h16.5"/></svg>
+                            <span x-show="sidebarExpanded" x-transition.origin.left class="whitespace-nowrap">Nilai Mapel</span>
+                            <span class="sr-only" x-show="!sidebarExpanded" x-transition.origin.left>Nilai Mapel</span>
                         </a>
                     </li>
                 @endif
@@ -245,4 +269,34 @@
 </footer>
 
 </body>
+<script>
+    function liveClock() {
+        return {
+            now: '',
+            interval: null,
+            start() {
+                this.tick();
+                this.interval = setInterval(() => this.tick(), 1000);
+                window.addEventListener('beforeunload', () => this.stop());
+            },
+            tick() {
+                const options = {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                };
+                this.now = new Date().toLocaleString('id-ID', options);
+            },
+            stop() {
+                if (this.interval) {
+                    clearInterval(this.interval);
+                }
+            },
+        };
+    }
+</script>
 </html>

@@ -49,6 +49,7 @@
                 $mataPelajaran = $journal->subject->name ?? $journal->mata_pelajaran;
                 $detail = [
                     'id' => $journal->id,
+                    'kelas' => $journal->classroom?->name,
                     'tanggal_label' => $journal->tanggal->translatedFormat('l, d F Y'),
                     'tanggal_raw' => $journal->tanggal->toDateString(),
                     'mata_pelajaran' => $mataPelajaran,
@@ -57,6 +58,7 @@
                     'durasi_menit' => $journal->jam_mulai->diffInMinutes($journal->jam_selesai),
                     'topik' => $journal->topik,
                     'catatan' => $journal->catatan,
+                    'dokumentasi_url' => $journal->documentation_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($journal->documentation_path) : null,
                     'dibuat' => $journal->created_at?->translatedFormat('d F Y H:i'),
                     'diubah' => $journal->updated_at?->translatedFormat('d F Y H:i'),
                 ];
@@ -93,6 +95,10 @@
                     <p class="text-xs uppercase tracking-wide text-emerald-100">Detail Jurnal Mengajar</p>
                     <h3 class="text-xl font-semibold" x-text="journal?.mata_pelajaran ?? ''"></h3>
                     <p class="text-sm text-emerald-100/80" x-text="journal?.tanggal_label ?? ''"></p>
+                    <p class="mt-1 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold" x-show="journal?.kelas">
+                        <span class="text-emerald-50/80">Kelas</span>
+                        <span class="text-white" x-text="journal?.kelas"></span>
+                    </p>
                 </div>
                 <button @click="close()" class="rounded-full bg-white/25 p-2 text-white transition hover:bg-white/35">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
@@ -116,6 +122,14 @@
                     <div class="rounded-xl border border-slate-200 bg-white p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Catatan</p>
                         <p class="mt-2 text-sm leading-relaxed text-slate-600" x-text="journal?.catatan || 'Tidak ada catatan tambahan.'"></p>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-white p-4" x-show="journal?.dokumentasi_url" x-cloak>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Dokumentasi Kelas</p>
+                        <img :src="journal?.dokumentasi_url" alt="Dokumentasi kelas" class="mt-2 aspect-video w-full rounded-lg border border-slate-100 object-cover">
+                        <a class="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-emerald-700 hover:text-emerald-600" :href="journal?.dokumentasi_url" target="_blank" rel="noopener">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0 4.5-4.5M12 15 7.5 10.5M5 15v3a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 18v-3"/></svg>
+                            Buka atau unduh foto
+                        </a>
                     </div>
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
                         <p>Dicatat: <span class="font-medium" x-text="journal?.dibuat || '-' "></span></p>

@@ -6,6 +6,7 @@ use App\Imports\StudentsImport;
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
 use App\Models\Student;
+use App\Services\StudentAttendanceSummaryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -42,6 +43,18 @@ class StudentController extends Controller
         $classrooms = Classroom::orderBy('name')->get();
 
         return view('students.create', compact('classrooms'));
+    }
+
+    public function show(Student $student, StudentAttendanceSummaryService $summaryService): View
+    {
+        $student->load('classroom');
+
+        $attendanceSummary = $summaryService->summarize($student->id);
+
+        return view('students.show', [
+            'student' => $student,
+            'summary' => $attendanceSummary,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

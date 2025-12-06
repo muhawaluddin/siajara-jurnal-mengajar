@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
+use App\Models\Classroom;
 
 class TeachingJournal extends Model
 {
@@ -16,12 +17,14 @@ class TeachingJournal extends Model
     protected $fillable = [
         'guru_id',
         'subject_id',
+        'classroom_id',
         'mata_pelajaran',
         'tanggal',
         'jam_mulai',
         'jam_selesai',
         'topik',
         'catatan',
+        'documentation_path',
     ];
 
     /** @var array<string, string> */
@@ -42,6 +45,11 @@ class TeachingJournal extends Model
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function classroom(): BelongsTo
+    {
+        return $this->belongsTo(Classroom::class);
     }
 
     public function subject(): BelongsTo

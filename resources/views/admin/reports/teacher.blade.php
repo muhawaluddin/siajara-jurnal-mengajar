@@ -78,11 +78,16 @@
         summaries: {{ \Illuminate\Support\Js::from($summaries) }},
         selectedId: {{ $filters['teacher_id'] ? \Illuminate\Support\Js::from($filters['teacher_id']) : 'null' }},
         detail: {{ $preselected ? \Illuminate\Support\Js::from($preselected) : 'null' }},
+        selectedRecord: {{ $preselected ? \Illuminate\Support\Js::from($preselected['records'][0] ?? null) : 'null' }},
         showModal: {{ $preselected ? 'true' : 'false' }},
         select(teacher) {
             this.detail = teacher;
             this.selectedId = teacher?.guru?.id ?? null;
+            this.selectedRecord = (teacher?.records ?? [])[0] ?? null;
             this.showModal = true;
+        },
+        setRecord(record) {
+            this.selectedRecord = record;
         },
         formatDuration(total) {
             total = Number(total ?? 0);
@@ -96,6 +101,13 @@
             }
             const date = new Date(value);
             return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        },
+        formatTimeRange(record) {
+            if (!record) return '-';
+            const start = record.jam_mulai ?? '';
+            const end = record.jam_selesai ?? '';
+            if (!start && !end) return '-';
+            return [start, end].filter(Boolean).join(' - ');
         }
     }"
     @keydown.escape.window="showModal = false"
@@ -165,22 +177,68 @@
                 </template>
 
                 <template x-if="detail && (detail.records ?? []).length">
-                    <div class="space-y-3">
-                        <template x-for="(record, index) in detail.records" :key="`${record.id ?? ''}-${index}`">
-                            <div class="rounded-xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
-                                <div class="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-emerald-800">
-                                    <span x-text="formatDate(record.tanggal)"></span>
-                                    <span x-text="`${record.durasi_menit ?? 0} menit`"></span>
+                    <div class="space-y-4 lg:grid lg:grid-cols-3 lg:gap-4 lg:space-y-0">
+                        <div class="space-y-3 lg:col-span-2">
+                            <template x-for="(record, index) in detail.records" :key="`${record.id ?? ''}-${index}`">
+                                <button type="button"
+                                        class="w-full text-left rounded-xl border px-4 py-3 transition"
+                                        @click="setRecord(record)"
+                                        :class="selectedRecord?.id === record.id ? 'border-emerald-300 bg-emerald-50 shadow-sm' : 'border-emerald-100 bg-emerald-50/80 hover:border-emerald-200'">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-emerald-800">
+                                        <span x-text="formatDate(record.tanggal)"></span>
+                                        <span x-text="`${record.durasi_menit ?? 0} menit`"></span>
+                                    </div>
+                                    <p class="mt-1 text-sm text-slate-700 font-semibold" x-text="record.mata_pelajaran ?? '-' "></p>
+                                    <p class="mt-1 inline-flex items-center gap-2 rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-emerald-700" x-show="record.classroom?.name">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                        <span x-text="record.classroom?.name"></span>
+                                    </p>
+                                    <template x-if="record.topik">
+                                        <p class="text-xs text-slate-500 mt-1">Topik: <span x-text="record.topik"></span></p>
+                                    </template>
+                                    <template x-if="record.catatan">
+                                        <p class="text-xs text-slate-500 mt-1">Catatan: <span x-text="record.catatan"></span></p>
+                                    </template>
+                                </button>
+                            </template>
+                        </div>
+
+                        <div class="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 lg:col-span-1" x-show="selectedRecord" x-cloak>
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Detail Pertemuan</p>
+                                    <p class="text-sm font-semibold text-emerald-900 mt-1" x-text="formatDate(selectedRecord?.tanggal)"></p>
+                                    <p class="text-xs text-slate-600" x-text="formatTimeRange(selectedRecord)"></p>
                                 </div>
-                                <p class="mt-1 text-sm text-slate-700 font-semibold" x-text="record.mata_pelajaran ?? '-' "></p>
-                                <template x-if="record.topik">
-                                    <p class="text-xs text-slate-500 mt-1">Topik: <span x-text="record.topik"></span></p>
+                                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-emerald-700" x-text="`${selectedRecord?.durasi_menit ?? 0} menit`"></span>
+                            </div>
+                            <div class="mt-3 space-y-2 text-sm text-slate-700">
+                                <div class="font-semibold" x-text="selectedRecord?.mata_pelajaran ?? '-'"></div>
+                                <div class="inline-flex items-center gap-2 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-700" x-show="selectedRecord?.classroom?.name">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    <span x-text="selectedRecord?.classroom?.name"></span>
+                                </div>
+                                <template x-if="selectedRecord?.topik">
+                                    <p class="text-xs text-slate-600">Topik: <span class="font-medium" x-text="selectedRecord.topik"></span></p>
                                 </template>
-                                <template x-if="record.catatan">
-                                    <p class="text-xs text-slate-500 mt-1">Catatan: <span x-text="record.catatan"></span></p>
+                                <template x-if="selectedRecord?.catatan">
+                                    <p class="text-xs text-slate-600">Catatan: <span class="font-medium" x-text="selectedRecord.catatan"></span></p>
                                 </template>
                             </div>
-                        </template>
+                            <template x-if="selectedRecord?.documentation_url">
+                                <div class="mt-3 space-y-2 rounded-lg border border-emerald-100 bg-white p-2">
+                                    <img :src="selectedRecord.documentation_url" alt="Dokumentasi kelas" class="aspect-video w-full rounded-lg object-cover">
+                                    <a :href="selectedRecord.documentation_url" target="_blank" rel="noopener"
+                                       class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-600">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0 6-6m-6 6-6-6"/></svg>
+                                        Buka dokumentasi
+                                    </a>
+                                </div>
+                            </template>
+                            <template x-if="!selectedRecord">
+                                <p class="text-xs text-slate-500">Pilih salah satu pertemuan untuk melihat detailnya.</p>
+                            </template>
+                        </div>
                     </div>
                 </template>
             </div>

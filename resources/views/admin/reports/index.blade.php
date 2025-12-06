@@ -86,7 +86,7 @@
         <p class="text-xs text-emerald-700 mt-1">Hanya menampilkan data pada tanggal <span class="font-semibold">{{ Carbon::parse($selectedSpecificDate)->translatedFormat('d F Y') }}</span>.</p>
     @endif
 
-    <div class="mt-4 grid gap-4 md:grid-cols-5">
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
         <div class="rounded-xl border border-green-200 bg-green-50 p-4">
             <p class="text-xs font-semibold uppercase text-green-700">Hadir</p>
             <p class="mt-2 text-2xl font-bold text-green-800">{{ $report['attendance']['summary']['hadir'] }}</p>
@@ -95,9 +95,17 @@
             <p class="text-xs font-semibold uppercase text-yellow-700">Izin</p>
             <p class="mt-2 text-2xl font-bold text-yellow-800">{{ $report['attendance']['summary']['izin'] }}</p>
         </div>
+        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-xs font-semibold uppercase text-amber-700">Pulang Izin</p>
+            <p class="mt-2 text-2xl font-bold text-amber-800">{{ $report['attendance']['summary']['pulang izin'] }}</p>
+        </div>
         <div class="rounded-xl border border-purple-200 bg-purple-50 p-4">
             <p class="text-xs font-semibold uppercase text-purple-700">Sakit</p>
             <p class="mt-2 text-2xl font-bold text-purple-800">{{ $report['attendance']['summary']['sakit'] }}</p>
+        </div>
+        <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+            <p class="text-xs font-semibold uppercase text-blue-700">Pulang Sakit</p>
+            <p class="mt-2 text-2xl font-bold text-blue-800">{{ $report['attendance']['summary']['pulang sakit'] }}</p>
         </div>
         <div class="rounded-xl border border-red-200 bg-red-50 p-4">
             <p class="text-xs font-semibold uppercase text-red-700">Alpa</p>
@@ -118,7 +126,9 @@
                     <th class="px-4 py-3">Kelas</th>
                     <th class="px-4 py-3 text-center">Hadir</th>
                     <th class="px-4 py-3 text-center">Izin</th>
+                    <th class="px-4 py-3 text-center">Pulang Izin</th>
                     <th class="px-4 py-3 text-center">Sakit</th>
+                    <th class="px-4 py-3 text-center">Pulang Sakit</th>
                     <th class="px-4 py-3 text-center">Alpa</th>
                 </tr>
             </thead>
@@ -129,12 +139,14 @@
                     <td class="px-4 py-3 text-slate-600">{{ $entry['student']['classroom'] ?? '-' }}</td>
                     <td class="px-4 py-3 text-center text-green-700 font-semibold">{{ $entry['totals']['hadir'] }}</td>
                     <td class="px-4 py-3 text-center text-yellow-700 font-semibold">{{ $entry['totals']['izin'] }}</td>
+                    <td class="px-4 py-3 text-center text-amber-700 font-semibold">{{ $entry['totals']['pulang izin'] }}</td>
                     <td class="px-4 py-3 text-center text-purple-700 font-semibold">{{ $entry['totals']['sakit'] }}</td>
+                    <td class="px-4 py-3 text-center text-blue-700 font-semibold">{{ $entry['totals']['pulang sakit'] }}</td>
                     <td class="px-4 py-3 text-center text-red-700 font-semibold">{{ $entry['totals']['alpa'] }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500">Belum ada data absensi pada periode ini.</td>
+                    <td colspan="8" class="px-4 py-6 text-center text-sm text-slate-500">Belum ada data absensi pada periode ini.</td>
                 </tr>
             @endforelse
             </tbody>

@@ -62,11 +62,16 @@
         <tbody class="divide-y divide-slate-100 bg-white">
         @forelse($students as $student)
             <tr>
-                <td class="px-4 py-3 font-medium text-slate-800">{{ $student->name }}</td>
+                <td class="px-4 py-3 font-medium text-slate-800">
+                    <a href="{{ route('admin.students.show', $student) }}" class="text-emerald-700 hover:underline font-semibold">
+                        {{ $student->name }}
+                    </a>
+                </td>
                 <td class="px-4 py-3 text-slate-600">{{ $student->nis ?? '-' }}</td>
                 <td class="px-4 py-3 text-slate-600">{{ $student->classroom?->name ?? '-' }}</td>
                 <td class="px-4 py-3 text-right">
                     <div class="flex items-center justify-end gap-2">
+                        <a href="{{ route('admin.students.show', $student) }}" class="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50">Profil</a>
                         <a href="{{ route('admin.students.edit', $student) }}" class="rounded-lg border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-600 hover:bg-emerald-50">Ubah</a>
                         <form method="POST" action="{{ route('admin.students.destroy', $student) }}" onsubmit="return confirm('Hapus data siswa ini?');">
                             @csrf
